@@ -6,8 +6,8 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "dtoolz",
-    "version": "0.0.0"
+    "productName": "Habit Watcher",
+    "version": "0.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -15,8 +15,8 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
+      "category": "Productivity",
+      "copyright": "Copyright © 2022, n4ze3m",
       "deb": {
         "depends": []
       },
@@ -28,8 +28,8 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
-      "longDescription": "",
+      "identifier": "site.n4ze3m.habit-watcher",
+      "longDescription": "Open source habit tracker for your desktop",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -38,7 +38,7 @@
         "signingIdentity": null
       },
       "resources": [],
-      "shortDescription": "",
+      "shortDescription": "Open source habit tracker",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
@@ -47,7 +47,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src blob: data: filesystem: ws: http: https: 'unsafe-eval' 'unsafe-inline'; frame-src 'self'; object-src 'self'"
     },
     "updater": {
       "active": false
@@ -57,8 +57,11 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "dtoolz",
-        "width": 800
+        "title": "Habit Watcher",
+        "width": 800,
+        "minWidth": 500,
+        "minHeight": 500,
+        "center": true
       }
     ]
   }

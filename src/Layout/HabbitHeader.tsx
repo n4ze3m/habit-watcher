@@ -24,7 +24,7 @@ export const HabbitHeader = () => {
 					weight="bold"
 					size="lg"
 				>
-					Habbit Watcher
+					Habit Watcher
 				</Text>
 			</Container>
 		</Header>

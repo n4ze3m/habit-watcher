@@ -13,6 +13,11 @@ rust-version = "1.57"
 [build-dependencies]
 tauri-build = { version = "1.1", features = [] }
 
+[dependencies.tauri-plugin-sql]
+git = "https://github.com/tauri-apps/tauri-plugin-sql"
+# tag = "v0.1.0" Not available yet
+features = ["sqlite"] # or "postgres", or "mysql"
+
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }

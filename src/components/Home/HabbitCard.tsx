@@ -1,22 +1,28 @@
-import { Group, Card, Text, Checkbox } from "@mantine/core";
+import { Group, Card, Text, Checkbox, Menu, createStyles } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
 import Calendar from "react-github-contribution-calendar";
+import { Habbit, HabbitView } from "../../models/habbit";
+import { checkHabbit, deleteHabbit } from "../../services/storage";
 
-var values = {
-	"2016-06-23": 1,
-	"2016-06-26": 1,
-	"2016-06-27": 1,
-	"2016-06-28": 1,
-	"2016-06-29": 1,
-};
-var until = "2016-06-30";
 var panelColors = ["#0d1117", "#39d353"];
 
+
+
+const useStyles = createStyles((theme) => ({
+	icon: {
+		height: 30,
+		width: 30,
+		color: theme.colors.gray[7],
+	}
+}));
 export const HabbitCardStats = ({
 	label,
 	value,
 }: {
 	label: string;
-	value: string;
+	value: number;
 }) => {
 	return (
 		<div>
@@ -29,23 +35,116 @@ export const HabbitCardStats = ({
 		</div>
 	);
 };
-export const HabbitCard = () => {
+
+interface HabbitCardProps extends HabbitView {
+	setHabbit: React.Dispatch<React.SetStateAction<Habbit | null>>;
+	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const HabbitCard = (view: HabbitCardProps) => {
+
+	const client = useQueryClient()
+	const { classes } = useStyles();
+
+
+	const [checked, setChecked] = React.useState(view.isChecked);
+
+
+	const { mutate: checkHabbitMutation } = useMutation(checkHabbit, {
+		onSuccess: (data) => {
+			client.invalidateQueries(["fetchAllHabbits"])
+			showNotification({
+				title: "Success",
+				message: data,
+				color: "teal",
+			})
+		},
+		onError: () => {
+			showNotification({
+				title: "Error",
+				message: "There was an error checking your habit",
+				color: "red",
+			})
+		}
+	})
+
+
+	const { mutate: deleteHabbitMutation } = useMutation(deleteHabbit, {
+		onSuccess: (data) => {
+			client.invalidateQueries(["fetchAllHabbits"])
+			showNotification({
+				title: "Success",
+				message: data,
+				color: "teal",
+			})
+		},
+		onError: () => {
+			showNotification({
+				title: "Error",
+				message: "There was an error deleting your habit",
+				color: "red",
+			})
+		}
+	})
+
+
+
+
+
 	return (
 		<Card withBorder={true} p="md">
 			<Group position="apart">
 				<Text weight="bold" size="lg">
-					Habbit Name
+					{view.habbit.name}
 				</Text>
-				<Checkbox color="teal" size="lg" />
+				<div>
+					<Group spacing={0} position="right">
+						<Checkbox color="teal" size="lg"
+							checked={checked}
+							onChange={(e) => {
+								setChecked(e.currentTarget.checked);
+								checkHabbitMutation(view.habbit.id);
+							}}
+						/>
+						<Menu trigger="hover" openDelay={100} closeDelay={400} position="bottom-end">
+							<Menu.Target>
+								<svg className={classes.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" >
+									<path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+								</svg>
+
+							</Menu.Target>
+
+							<Menu.Dropdown>
+								<Menu.Item
+									onClick={() => {
+										view.setHabbit(view.habbit)
+										view.setIsOpen(true)
+									}}
+								>
+									Rename Habbit
+								</Menu.Item>
+								<Menu.Divider />
+								<Menu.Label
+
+								>Danger zone</Menu.Label>
+								<Menu.Item color="red" onClick={() => {
+									deleteHabbitMutation(view.habbit.id)
+								}}>
+									Remove Habbit
+								</Menu.Item>
+							</Menu.Dropdown>
+						</Menu>
+					</Group>
+				</div>
 			</Group>
 			<Group position="apart" my="md">
-				<HabbitCardStats label="Completed" value="5" />
-				<HabbitCardStats label="Missed" value="2" />
-				<HabbitCardStats label="Current Streak" value="3" />
+				{
+					view.stats.map((stat) => (<HabbitCardStats key={stat.name} label={stat.name} value={stat.value} />))
+				}
 			</Group>
 			<Calendar
-				values={values}
-				until={until}
+				values={view.contributions}
+				until={view.untilDate.toString()}
 				weekLabelAttributes={undefined}
 				monthLabelAttributes={undefined}
 				panelAttributes={undefined}

@@ -9,19 +9,61 @@ import {
 	Stack,
 } from "@mantine/core";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createHabbit } from "../../services/storage";
+import { useNavigate } from "react-router-dom";
+import { showNotification } from "@mantine/notifications";
+
 export function NewBody() {
+	const client = useQueryClient();
+	const navigate = useNavigate();
 	const form = useForm({
 		initialValues: {
 			name: "",
 		},
 	});
 
+	const onHabbitSubmit = async (name: string) => {
+		await createHabbit(name);
+	};
+
+	const { mutate: addHabbit, isLoading } = useMutation(onHabbitSubmit, {
+		onSuccess: () => {
+			showNotification({
+				title: "Success",
+				message: "Awesome! You've created a new habit",
+				color: "teal",
+			})
+			client.invalidateQueries(["fetchAllHabbits"]);
+			navigate("/");
+		},
+		onError: (e) => {
+			showNotification({
+				title: "Error",
+				message: "There was an error creating your habit",
+				color: "red",
+			})
+		},
+	});
+
+	const suggestions = [
+		"Walk the dog 🐶",
+		"Drink water 💧",
+		"Read a book 📚",
+		"Go for a run 🏃‍♂️",
+		"Go to the gym 🏋️‍♂️",
+		"Meditate 🧘‍♂️",
+		"Take a nap 💤",
+		"Take a shower 🚿",
+		"Eat a healthy meal 🍎",
+	]
+
 	return (
 		<Paper radius="md" p="xl" withBorder={true}>
 			<Text size="lg" weight={500}>
 				{`Let's Start an Awesome Habit 👀`}
 			</Text>
-			<form onSubmit={form.onSubmit(() => {})}>
+			<form onSubmit={form.onSubmit((value) => addHabbit(value.name))}>
 				<Stack my="md">
 					<TextInput
 						required={true}
@@ -41,19 +83,24 @@ export function NewBody() {
 							}
 						}}
 					>
-						<Chip value="Walk the dog 🐶">{`Walk the dog 🐶`}</Chip>
-						<Chip value="Go to the gym 🏋️‍♂️">{`Go to the gym 🏋️‍♂️`}</Chip>
-						<Chip value="Read a book 📚">{`Read a book 📚`}</Chip>
-						<Chip value="Meditate 🧘‍♂️">{`Meditate 🧘‍♂️`}</Chip>
-						<Chip value="Drink water 💧">{`Drink water 💧`}</Chip>
-						<Chip value={"Eat healthy 🥗"}>{`Eat healthy 🥗`}</Chip>
-						<Chip value={"Sleep early 🛌"}>{`Sleep early 🛌`}</Chip>
+						{
+							suggestions.map((suggestion) => (
+								<Chip key={suggestion} value={suggestion}>
+									{suggestion}
+								</Chip>
+							))
+						}
 					</Chip.Group>
 				</Stack>
 
 				<Group position="apart" mt="xl">
-					<Button fullWidth={true} type="submit" color="teal">
-						Create Habbit
+					<Button
+						fullWidth={true}
+						type="submit"
+						color="teal"
+						loading={isLoading}
+					>
+						Create Habit
 					</Button>
 				</Group>
 			</form>

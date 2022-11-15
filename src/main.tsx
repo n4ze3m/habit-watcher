@@ -7,6 +7,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
 import { Layout } from "./Layout";
 import { NewHabitPage } from "./new-habit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NotificationsProvider } from "@mantine/notifications";
+const queryClient = new QueryClient();
 const router = createBrowserRouter([
 	{
 		path: "/",
@@ -24,15 +27,19 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<React.StrictMode>
-		<MantineProvider
-			withGlobalStyles={true}
-			withNormalizeCSS={true}
-			theme={{
-				colorScheme: "dark",
-				fontFamily: "poppins",
-			}}
-		>
-			<RouterProvider router={router} />
-		</MantineProvider>
+		<QueryClientProvider client={queryClient}>
+			<MantineProvider
+				withGlobalStyles={true}
+				withNormalizeCSS={true}
+				theme={{
+					colorScheme: "dark",
+					fontFamily: "poppins",
+				}}
+			>
+				<NotificationsProvider>
+					<RouterProvider router={router} />
+				</NotificationsProvider>
+			</MantineProvider>
+		</QueryClientProvider>
 	</React.StrictMode>,
 );

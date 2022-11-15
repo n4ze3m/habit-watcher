@@ -2,16 +2,19 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use tauri_plugin_sql::{Migration, MigrationKind, TauriSql};
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .plugin(TauriSql::default().add_migrations(
+            "sqlite:hw.db",
+            vec![Migration {
+                version: 1,
+                description: "Initial migration",
+                kind: MigrationKind::Up,
+                sql: include_str!("../migrations/1.sql"),
+            }],
+        ))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
