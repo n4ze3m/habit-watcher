@@ -1,4 +1,4 @@
-import { Group, Card, Text, Checkbox, Menu, createStyles } from "@mantine/core";
+import { Group, Card, Text, Checkbox, Menu, createStyles, Divider } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -99,13 +99,7 @@ export const HabbitCard = (view: HabbitCardProps) => {
 				</Text>
 				<div>
 					<Group spacing={0} position="right">
-						<Checkbox color="teal" size="lg"
-							checked={checked}
-							onChange={(e) => {
-								setChecked(e.currentTarget.checked);
-								checkHabbitMutation(view.habbit.id);
-							}}
-						/>
+
 						<Menu trigger="hover" openDelay={100} closeDelay={400} position="bottom-end">
 							<Menu.Target>
 								<svg className={classes.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" >
@@ -149,6 +143,16 @@ export const HabbitCard = (view: HabbitCardProps) => {
 				monthLabelAttributes={undefined}
 				panelAttributes={undefined}
 				panelColors={panelColors}
+			/>
+			<Divider my="sm" />
+			<Checkbox color="teal" size="lg"
+				checked={checked}
+				
+				label={checked ? "Done today" : "Mark as done"}
+				onChange={(e) => {
+					setChecked(e.currentTarget.checked);
+					checkHabbitMutation(view.habbit.id);
+				}}
 			/>
 		</Card>
 	);
