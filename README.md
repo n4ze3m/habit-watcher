@@ -1,6 +1,6 @@
 # Habit Watcher
 
-Habit Watcher is a simple habit tracker that allows you to track your habits and see how you are doing over time.
+Habit Watcher is a simple habit tracker that allows you to track your habits with Github-like contributions graph.
 
 ## Features
 
