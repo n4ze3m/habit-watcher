@@ -42,3 +42,9 @@ Habit Watcher is licensed under the [MIT License](LICENSE).
 ## Support
 
 If you like this project, please consider supporting me on  [Ko-fi](https://ko-fi.com/n4ze3m).
+
+
+## Credits
+
+- [Tauri](https://tauri.dev/) 
+- [react-github-contribution-calendar](https://npmjs.com/package/react-github-contribution-calendar) 
