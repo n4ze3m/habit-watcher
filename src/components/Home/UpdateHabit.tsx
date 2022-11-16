@@ -61,7 +61,7 @@ export function UpdaetHabit({ name, id, onFinish }: UpdateHabitProps) {
     return (
         <Paper radius="md" p="xl" withBorder={true}>
             <Text size="lg" weight={500}>
-                {`Let's Start an Awesome Habit 👀`}
+                {"So, what's your new habit name?"}
             </Text>
             <form onSubmit={form.onSubmit((value) => update(value.name))}>
                 <Stack my="md">

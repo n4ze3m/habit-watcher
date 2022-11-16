@@ -147,7 +147,7 @@ export const HabbitCard = (view: HabbitCardProps) => {
 			<Divider my="sm" />
 			<Checkbox color="teal" size="lg"
 				checked={checked}
-				
+				width="100%"
 				label={checked ? "Done today" : "Mark as done"}
 				onChange={(e) => {
 					setChecked(e.currentTarget.checked);
