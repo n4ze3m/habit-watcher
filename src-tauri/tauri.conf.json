@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "Habit Watcher",
-    "version": "0.0.1"
+    "version": "0.0.3"
   },
   "tauri": {
     "allowlist": {
@@ -50,7 +50,12 @@
       "csp": "default-src blob: data: filesystem: ws: http: https: 'unsafe-eval' 'unsafe-inline'; frame-src 'self'; object-src 'self'"
     },
     "updater": {
-      "active": false
+      "active": true,
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNDQTdFNjhCNEI5QzYwMjIKUldRaVlKeExpK2FuUEpWcDVmWVdOc0JVUUZBaFY5aHIvM2k5aVFETFFidDJCbE1tVi9JOFRmSDYK",
+      "endpoints": [
+        "https://gist.github.com/n4ze3m/548edf07e2b4fea999830fd013cbbcf2/raw"
+      ]
     },
     "windows": [
       {
