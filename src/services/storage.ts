@@ -98,7 +98,6 @@ export async function checkHabbit(id: number) {
 		[id, moment().format("YYYY-MM-DD")],
 	);
 
-
 	if (isAlreadyChecked.length > 0) {
 		// delete the log
 		await db.execute("DELETE FROM habbit_log WHERE id = ?", [
@@ -108,11 +107,15 @@ export async function checkHabbit(id: number) {
 		return "You have unchecked the habit";
 	}
 
-	await db.execute("INSERT INTO habbit_log (habbit_id) VALUES (?)", [id]);
+	const created_at = moment();
+
+	await db.execute(
+		"INSERT INTO habbit_log (habbit_id, created_at) VALUES (?, ?)",
+		[id, created_at.toISOString()],
+	);
 
 	return "Awesome! You have checked the habit";
 }
-
 
 export async function deleteHabbit(id: number) {
 	await load;
