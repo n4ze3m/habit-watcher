@@ -15,7 +15,7 @@ const useStyles = createStyles((theme) => ({
 		height: 30,
 		width: 30,
 		color: theme.colors.gray[7],
-	}
+	},
 }));
 export const HabbitCardStats = ({
 	label,
@@ -92,9 +92,11 @@ export const HabbitCard = (view: HabbitCardProps) => {
 
 
 	return (
-		<Card withBorder={true} p="md">
+		<Card withBorder={true} p="md"	>
 			<Group position="apart">
-				<Text weight="bold" size="lg">
+				<Text weight="bold" size="lg"
+					strikethrough={checked}
+				>
 					{view.habbit.name}
 				</Text>
 				<div>
