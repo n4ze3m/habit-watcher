@@ -93,25 +93,22 @@ export async function getAllhabbitsWithStats() {
 
 export async function checkHabbit(id: number) {
 	await load;
+	const today = moment(new Date()).format("YYYY-MM-DD")
 	const isAlreadyChecked: HabbitLog[] = await db.select(
 		"SELECT * FROM habbit_log WHERE habbit_id = ? AND date(created_at) = ?",
-		[id, moment().format("YYYY-MM-DD")],
+		[id,today ],
 	);
-
 	if (isAlreadyChecked.length > 0) {
-		// delete the log
-		await db.execute("DELETE FROM habbit_log WHERE id = ?", [
-			isAlreadyChecked[0].id,
-		]);
-
+		isAlreadyChecked.forEach(async (log) => {
+			await db.execute("DELETE FROM habbit_log WHERE id = ?", [log.id]);
+		});
 		return "You have unchecked the habit";
 	}
-
-	const created_at = moment();
-
+	// kinda weird but it works
+	const created_at = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 	await db.execute(
 		"INSERT INTO habbit_log (habbit_id, created_at) VALUES (?, ?)",
-		[id, created_at.toISOString()],
+		[id, created_at],
 	);
 
 	return "Awesome! You have checked the habit";
