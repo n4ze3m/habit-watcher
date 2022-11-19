@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Habbit } from "../../models/habbit";
 import React from "react";
 import { UpdaetHabit } from "./UpdateHabit";
+
 export const HabbitList = () => {
 	const fetchHabbit = async () => {
 		const result = await getAllhabbitsWithStats();
@@ -17,8 +18,10 @@ export const HabbitList = () => {
 	const [habbit, setHabbit] = React.useState<Habbit | null>(null)
 	const [open, setOpen] = React.useState(false);
 
+
 	return (
 		<>
+	
 			{
 				status === "loading" ? (<div>
 					<Skeleton height={40} />
@@ -29,6 +32,7 @@ export const HabbitList = () => {
 			}
 			{
 				status === "success" ? <ScrollArea mt="lg">
+						
 					<SimpleGrid
 						cols={2}
 						spacing="lg"

@@ -3,6 +3,7 @@ import { showNotification } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import Calendar from "react-github-contribution-calendar";
+import { useConfetti } from "../../hooks/useConfetti";
 import { Habbit, HabbitView } from "../../models/habbit";
 import { checkHabbit, deleteHabbit } from "../../services/storage";
 
@@ -42,7 +43,9 @@ interface HabbitCardProps extends HabbitView {
 }
 
 export const HabbitCard = (view: HabbitCardProps) => {
-
+	const {
+		setShowing,
+	} = useConfetti()
 	const client = useQueryClient()
 	const { classes } = useStyles();
 
@@ -53,9 +56,10 @@ export const HabbitCard = (view: HabbitCardProps) => {
 	const { mutate: checkHabbitMutation } = useMutation(checkHabbit, {
 		onSuccess: (data) => {
 			client.invalidateQueries(["fetchAllHabbits"])
+			setShowing(data.confetti)
 			showNotification({
 				title: "Success",
-				message: data,
+				message: data.message,
 				color: "teal",
 			})
 		},

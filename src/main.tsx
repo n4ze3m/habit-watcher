@@ -9,6 +9,7 @@ import { Layout } from "./Layout";
 import { NewHabitPage } from "./new-habit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NotificationsProvider } from "@mantine/notifications";
+import { ConfettiProvider } from "./hooks/useConfetti";
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
 	{
@@ -27,19 +28,21 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<React.StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<MantineProvider
-				withGlobalStyles={true}
-				withNormalizeCSS={true}
-				theme={{
-					colorScheme: "dark",
-					fontFamily: "poppins",
-				}}
-			>
-				<NotificationsProvider>
-					<RouterProvider router={router} />
-				</NotificationsProvider>
-			</MantineProvider>
-		</QueryClientProvider>
+		<ConfettiProvider>
+			<QueryClientProvider client={queryClient}>
+				<MantineProvider
+					withGlobalStyles={true}
+					withNormalizeCSS={true}
+					theme={{
+						colorScheme: "dark",
+						fontFamily: "poppins",
+					}}
+				>
+					<NotificationsProvider>
+						<RouterProvider router={router} />
+					</NotificationsProvider>
+				</MantineProvider>
+			</QueryClientProvider>
+		</ConfettiProvider>
 	</React.StrictMode>,
 );

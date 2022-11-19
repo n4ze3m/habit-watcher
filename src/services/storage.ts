@@ -30,7 +30,7 @@ export async function getAllhabbitsWithStats() {
 	const result: HabbitView[] = [];
 	const habbits: Habbit[] = await db.select("SELECT * FROM habbit", []);
 	for (const habbit of habbits) {
-		const habbitCreated = moment(habbit.created_at);
+		const yesterday = moment().toISOString();
 		const logs: HabbitLog[] = await db.select(
 			"SELECT * FROM habbit_log WHERE habbit_id = ?",
 			[habbit.id],
@@ -54,7 +54,15 @@ export async function getAllhabbitsWithStats() {
 			value: logs.length,
 		});
 		// find the number of missing days between the habbit creation and last log
-		const missingDays = moment().diff(habbitCreated, "days") - logs.length;
+		const days =
+			Math.abs(
+				moment(habbit.created_at, "YYYY-MM-DD")
+					.startOf("day")
+					.diff(moment(yesterday, "YYYY-MM-DD").startOf("day"), "days"),
+			) + 1;
+
+		const missingDays = days - logs.length;
+
 		stats.push({
 			name: "Missed",
 			value: missingDays > 0 ? missingDays : 0,
@@ -93,16 +101,19 @@ export async function getAllhabbitsWithStats() {
 
 export async function checkHabbit(id: number) {
 	await load;
-	const today = moment(new Date()).format("YYYY-MM-DD")
+	const today = moment(new Date()).format("YYYY-MM-DD");
 	const isAlreadyChecked: HabbitLog[] = await db.select(
 		"SELECT * FROM habbit_log WHERE habbit_id = ? AND date(created_at) = ?",
-		[id,today ],
+		[id, today],
 	);
 	if (isAlreadyChecked.length > 0) {
 		isAlreadyChecked.forEach(async (log) => {
 			await db.execute("DELETE FROM habbit_log WHERE id = ?", [log.id]);
 		});
-		return "You have unchecked the habit";
+		return {
+			message: "You have unchecked the habit",
+			confetti: false,
+		}
 	}
 	// kinda weird but it works
 	const created_at = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
@@ -110,8 +121,16 @@ export async function checkHabbit(id: number) {
 		"INSERT INTO habbit_log (habbit_id, created_at) VALUES (?, ?)",
 		[id, created_at],
 	);
+	// check all habbits completed today 
+	const allHabbits = await getAllhabbitsWithStats();
+	const allHabbitsCompleted = allHabbits.every(habbit => habbit.isChecked);
+	
 
-	return "Awesome! You have checked the habit";
+
+	return {
+		message: "Awesome! You have checked the habit",
+		confetti: allHabbitsCompleted,
+	}
 }
 
 export async function deleteHabbit(id: number) {
