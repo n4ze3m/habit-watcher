@@ -3,6 +3,7 @@ import { showNotification } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import Calendar from "react-github-contribution-calendar";
+import { useNavigate } from "react-router-dom";
 import { useConfetti } from "../../hooks/useConfetti";
 import { Habbit, HabbitView } from "../../models/habbit";
 import { checkHabbit, deleteHabbit } from "../../services/storage";
@@ -48,6 +49,7 @@ export const HabbitCard = (view: HabbitCardProps) => {
 	} = useConfetti()
 	const client = useQueryClient()
 	const { classes } = useStyles();
+	const navigate = useNavigate()
 
 
 	const [checked, setChecked] = React.useState(view.isChecked);
@@ -109,7 +111,9 @@ export const HabbitCard = (view: HabbitCardProps) => {
 									</svg>
 								</Menu.Target>
 								<Menu.Dropdown>
-									<Menu.Item>
+									<Menu.Item
+									onClick={() => navigate(`/summary/${view.habbit.id}`)}
+									>
 										Summary
 									</Menu.Item>
 									<Menu.Item
