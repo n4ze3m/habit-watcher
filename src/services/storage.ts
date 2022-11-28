@@ -151,6 +151,7 @@ export async function getHabitByID(id: number): Promise<SingleHabitView> {
 	stats.push({
 		name: "Total Completed",
 		value: logs.length,
+		description: "Total number of times you have completed this habit",
 	});
 
 	const contributions: Record<string, number> = {};
@@ -165,11 +166,13 @@ export async function getHabitByID(id: number): Promise<SingleHabitView> {
 	stats.push({
 		name: "Longest Streak",
 		value: longestStreak(groupeDates),
+		description: "Longest streak of days you have completed this habit",
 	});
 
 	stats.push({
 		name: "Current Streak",
 		value: currentStreak(groupeDates),
+		description: "Current streak of days you have completed this habit",
 	});
 
 	return {

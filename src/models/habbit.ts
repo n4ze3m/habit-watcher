@@ -15,6 +15,7 @@ export interface HabbitLog {
 export interface HabbitStats {
 	name: string;
 	value: number;
+	description?: string;
 }
 
 export interface HabbitContributions {

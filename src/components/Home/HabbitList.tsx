@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Habbit } from "../../models/habbit";
 import React from "react";
 import { UpdaetHabit } from "./UpdateHabit";
+import { HabitLoading } from "../Common/HabitLoading";
 
 export const HabbitList = () => {
 	const fetchHabbit = async () => {
@@ -14,25 +15,13 @@ export const HabbitList = () => {
 
 	const { data, status } = useQuery(["fetchAllHabbits"], fetchHabbit);
 
-
-	const [habbit, setHabbit] = React.useState<Habbit | null>(null)
+	const [habbit, setHabbit] = React.useState<Habbit | null>(null);
 	const [open, setOpen] = React.useState(false);
-
-
 	return (
 		<>
-	
-			{
-				status === "loading" ? (<div>
-					<Skeleton height={40} />
-					<Skeleton my="md" height={60} />
-					<Skeleton my="md" height={80} />
-					<Skeleton height={20} />
-				</div>) : null
-			}
-			{
-				status === "success" ? <ScrollArea mt="lg">
-						
+			{status === "loading" ? <HabitLoading /> : null}
+			{status === "success" ? (
+				<ScrollArea mt="lg">
 					<SimpleGrid
 						cols={2}
 						spacing="lg"
@@ -42,37 +31,38 @@ export const HabbitList = () => {
 							{ maxWidth: 600, cols: 1, spacing: "sm" },
 						]}
 					>
-						{
-						}
-						{
-							data.length > 0 ? data.map((habbit) => (<HabbitCard key={habbit.habbit.id} {...habbit}
-								setHabbit={setHabbit}
-								setIsOpen={setOpen}
-							/>))
-								: <Text>
-									Oh no! You don't have any habbits yet. Create one now!
-								</Text>
-						}
+						{ }
+						{data.length > 0 ? (
+							data.map((habbit) => (
+								<HabbitCard
+									key={habbit.habbit.id}
+									{...habbit}
+									setHabbit={setHabbit}
+									setIsOpen={setOpen}
+								/>
+							))
+						) : (
+							<Text>
+								Oh no! You don't have any habbits yet. Create one now!
+							</Text>
+						)}
 					</SimpleGrid>
 					<Modal
 						opened={open}
 						onClose={() => setOpen(false)}
 						title="Update Habit"
 					>
-						{
-							habbit ? <UpdaetHabit {...habbit} onFinish={() => setOpen(false)} /> : null
-						}
+						{habbit ? (
+							<UpdaetHabit {...habbit} onFinish={() => setOpen(false)} />
+						) : null}
 					</Modal>
-				</ScrollArea> : null
-			}
-			{
-				status === "error" ? (<div>
-					<Text>
-						There was an error fetching your habbits
-					</Text>
+				</ScrollArea>
+			) : null}
+			{status === "error" ? (
+				<div>
+					<Text>There was an error fetching your habbits</Text>
 				</div>
-				) : null
-			}
+			) : null}
 		</>
 	);
 };
