@@ -4,6 +4,7 @@ import type {
 	HabbitContributions,
 	HabbitStats,
 	HabbitView,
+	SingleHabitView,
 } from "../models/habbit";
 import moment from "moment";
 import Database from "tauri-plugin-sql-api";
@@ -68,20 +69,12 @@ export async function getAllhabbitsWithStats() {
 			value: missingDays > 0 ? missingDays : 0,
 		});
 		// find the current streak
-		let currentStreak = 0;
-		let lastLogDate = moment();
-		for (const log of logs) {
-			const logDate = moment(log.created_at);
-			const diff = logDate.diff(lastLogDate, "days");
-			if (diff > 1) {
-				break;
-			}
-			currentStreak++;
-			lastLogDate = logDate;
-		}
+
+		const groupeDates = Object.keys(contributions);
+
 		stats.push({
 			name: "Current Streak",
-			value: currentStreak,
+			value: currentStreak(groupeDates),
 		});
 
 		const today = moment().format("YYYY-MM-DD");
@@ -113,7 +106,7 @@ export async function checkHabbit(id: number) {
 		return {
 			message: "You have unchecked the habit",
 			confetti: false,
-		}
+		};
 	}
 	// kinda weird but it works
 	const created_at = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
@@ -121,16 +114,14 @@ export async function checkHabbit(id: number) {
 		"INSERT INTO habbit_log (habbit_id, created_at) VALUES (?, ?)",
 		[id, created_at],
 	);
-	// check all habbits completed today 
+	// check all habbits completed today
 	const allHabbits = await getAllhabbitsWithStats();
-	const allHabbitsCompleted = allHabbits.every(habbit => habbit.isChecked);
-	
-
+	const allHabbitsCompleted = allHabbits.every((habbit) => habbit.isChecked);
 
 	return {
 		message: "Awesome! You have checked the habit",
 		confetti: allHabbitsCompleted,
-	}
+	};
 }
 
 export async function deleteHabbit(id: number) {
@@ -141,8 +132,118 @@ export async function deleteHabbit(id: number) {
 	return "Habit deleted";
 }
 
+export async function getHabitByID(id: number): Promise<SingleHabitView> {
+	await load;
+	const hbt: Habbit[] = await db.select("SELECT * FROM habbit WHERE id = ?", [
+		id,
+	]);
+	if (hbt.length === 0) {
+		throw new Error("Habit not found");
+	}
+	const habbit = hbt[0];
+	const logs: HabbitLog[] = await db.select(
+		"SELECT * FROM habbit_log WHERE habbit_id = ?",
+		[habbit.id],
+	);
+
+	const stats: HabbitStats[] = [];
+
+	stats.push({
+		name: "Total Completed",
+		value: logs.length,
+		description: "Total number of times you have completed this habit",
+	});
+
+	const contributions: Record<string, number> = {};
+
+	logs.forEach((log) => {
+		const date = moment(log.created_at).format("YYYY-MM-DD");
+		contributions[date] = 1;
+	});
+
+	const groupeDates = Object.keys(contributions);
+
+	stats.push({
+		name: "Longest Streak",
+		value: longestStreak(groupeDates),
+		description: "Longest streak of days you have completed this habit",
+	});
+
+	stats.push({
+		name: "Current Streak",
+		value: currentStreak(groupeDates),
+		description: "Current streak of days you have completed this habit",
+	});
+
+	return {
+		habbit,
+		stats,
+	};
+}
+
 export async function updateHabbit(id: number, name: string) {
 	await load;
 	await db.execute("UPDATE habbit SET name = ? WHERE id = ?", [name, id]);
 	return "Habit updated";
 }
+
+const longestStreak = (dates: string[]) => {
+	// sort dates
+	dates.sort()
+	let longestStreak = 0;
+	let currentStreak = 1;
+
+	for (let i = 1; i < dates.length; i++) {
+		// Check if the current date is consecutive with the previous date
+		if (isConsecutive(dates[i], dates[i - 1])) {
+			// If it is, increment the current streak
+			currentStreak++;
+		} else {
+			// If it isn't, reset the current streak to 1
+			currentStreak = 1;
+		}
+
+		// Update the longest streak if necessary
+		longestStreak = Math.max(longestStreak, currentStreak);
+	}
+	return longestStreak;
+};
+
+function isConsecutive(date1: string, date2: string) {
+	const d1 = new Date(date1);
+	const d2 = new Date(date2);
+
+	const timeDiff = d1.getTime() - d2.getTime();
+	const diffDays = timeDiff / (1000 * 3600 * 24);
+	return diffDays === 1;
+}
+const currentStreak = (dates: string[]) => {
+	// sort dates
+	const sortedDates = dates.sort((a, b) => {
+		return moment(new Date(a)).diff(moment(new Date(b)));
+	}).reverse();
+
+	let count = 0;
+	let currentDay = moment()
+
+
+	for (const day of sortedDates) {
+		const date = moment(day)
+		if (date.diff(currentDay, "days") === 0) {
+			count++
+		} else {
+			break
+		}
+		currentDay.subtract(1, "days")
+	}
+
+
+	return count;
+};
+
+
+interface Options {
+	startDate: string;
+	endDate: string;
+}
+

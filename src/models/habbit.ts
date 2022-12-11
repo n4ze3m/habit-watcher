@@ -15,6 +15,7 @@ export interface HabbitLog {
 export interface HabbitStats {
 	name: string;
 	value: number;
+	description?: string;
 }
 
 export interface HabbitContributions {
@@ -28,4 +29,9 @@ export interface HabbitView {
 	contributions: Record<string, number>;
 	isChecked: boolean;
 	untilDate: Date;
+}
+
+export interface SingleHabitView {
+	habbit: Habbit;
+	stats: HabbitStats[];
 }

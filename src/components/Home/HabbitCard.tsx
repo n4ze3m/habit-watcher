@@ -3,6 +3,7 @@ import { showNotification } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import Calendar from "react-github-contribution-calendar";
+import { useNavigate } from "react-router-dom";
 import { useConfetti } from "../../hooks/useConfetti";
 import { Habbit, HabbitView } from "../../models/habbit";
 import { checkHabbit, deleteHabbit } from "../../services/storage";
@@ -48,6 +49,7 @@ export const HabbitCard = (view: HabbitCardProps) => {
 	} = useConfetti()
 	const client = useQueryClient()
 	const { classes } = useStyles();
+	const navigate = useNavigate()
 
 
 	const [checked, setChecked] = React.useState(view.isChecked);
@@ -57,11 +59,6 @@ export const HabbitCard = (view: HabbitCardProps) => {
 		onSuccess: (data) => {
 			client.invalidateQueries(["fetchAllHabbits"])
 			setShowing(data.confetti)
-			showNotification({
-				title: "Success",
-				message: data.message,
-				color: "teal",
-			})
 		},
 		onError: () => {
 			showNotification({
@@ -97,46 +94,51 @@ export const HabbitCard = (view: HabbitCardProps) => {
 
 	return (
 		<Card withBorder={true} p="md"	>
-			<Group position="apart">
-				<Text weight="bold" size="lg"
-					strikethrough={checked}
-				>
-					{view.habbit.name}
-				</Text>
-				<div>
-					<Group spacing={0} position="right">
+			<Card.Section withBorder={true} inheritPadding={true} py="xs">
+				<Group position="apart">
+					<Text weight="bold" size="lg"
+						strikethrough={checked}
+					>
+						{view.habbit.name}
+					</Text>
+					<div>
+						<Group spacing={0} position="right">
 
-						<Menu trigger="hover" openDelay={100} closeDelay={400} position="bottom-end">
-							<Menu.Target>
-								<svg className={classes.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" >
-									<path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-								</svg>
+							<Menu withArrow={true} withinPortal={true} trigger="hover" openDelay={100} closeDelay={400} position="bottom-end">
+								<Menu.Target>
+									<svg className={classes.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+										<path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+									</svg>
+								</Menu.Target>
+								<Menu.Dropdown>
+									<Menu.Item
+									onClick={() => navigate(`/summary/${view.habbit.id}`)}
+									>
+										Summary
+									</Menu.Item>
+									<Menu.Item
+										onClick={() => {
+											view.setHabbit(view.habbit)
+											view.setIsOpen(true)
+										}}
+									>
+										Rename Habbit
+									</Menu.Item>
+									<Menu.Divider />
+									<Menu.Label
 
-							</Menu.Target>
-
-							<Menu.Dropdown>
-								<Menu.Item
-									onClick={() => {
-										view.setHabbit(view.habbit)
-										view.setIsOpen(true)
-									}}
-								>
-									Rename Habbit
-								</Menu.Item>
-								<Menu.Divider />
-								<Menu.Label
-
-								>Danger zone</Menu.Label>
-								<Menu.Item color="red" onClick={() => {
-									deleteHabbitMutation(view.habbit.id)
-								}}>
-									Remove Habbit
-								</Menu.Item>
-							</Menu.Dropdown>
-						</Menu>
-					</Group>
-				</div>
-			</Group>
+									>Danger zone</Menu.Label>
+									<Menu.Item color="red" onClick={() => {
+										deleteHabbitMutation(view.habbit.id)
+									}}>
+										Remove Habbit
+									</Menu.Item>
+								</Menu.Dropdown>
+							</Menu>
+						</Group>
+					</div>
+				</Group>
+			</Card.Section>
 			<Group position="apart" my="md">
 				{
 					view.stats.map((stat) => (<HabbitCardStats key={stat.name} label={stat.name} value={stat.value} />))
@@ -150,16 +152,18 @@ export const HabbitCard = (view: HabbitCardProps) => {
 				panelAttributes={undefined}
 				panelColors={panelColors}
 			/>
-			<Divider my="sm" />
-			<Checkbox color="teal" size="lg"
-				checked={checked}
-				width="100%"
-				label={checked ? "Done today" : "Mark as done"}
-				onChange={(e) => {
-					setChecked(e.currentTarget.checked);
-					checkHabbitMutation(view.habbit.id);
-				}}
-			/>
+			<Card.Section withBorder={true} inheritPadding={true} py="xs">
+				<Checkbox color="teal" radius="xl"
+					size="xl"
+					checked={checked}
+					width="100%"
+					label={checked ? "Done today" : "Mark as done"}
+					onChange={(e) => {
+						setChecked(e.currentTarget.checked);
+						checkHabbitMutation(view.habbit.id);
+					}}
+				/>
+			</Card.Section>
 		</Card>
 	);
 };
