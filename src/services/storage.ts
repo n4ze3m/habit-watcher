@@ -189,25 +189,34 @@ export async function updateHabbit(id: number, name: string) {
 
 const longestStreak = (dates: string[]) => {
 	// sort dates
-	const sortedDates = dates.sort((a, b) => {
-		return moment(a).diff(moment(b));
-	});
-	if (sortedDates.length === 0) {
-		return 0;
-	}
-	const lastDay = moment(sortedDates[0]);
-	let count = 1;
-	for (let i = 1; i < sortedDates.length; i++) {
-		const currentDay = moment(sortedDates[i]);
-		if (currentDay.diff(lastDay, "days") === 1) {
-			count++;
+	dates.sort()
+	let longestStreak = 0;
+	let currentStreak = 1;
+
+	for (let i = 1; i < dates.length; i++) {
+		// Check if the current date is consecutive with the previous date
+		if (isConsecutive(dates[i], dates[i - 1])) {
+			// If it is, increment the current streak
+			currentStreak++;
+		} else {
+			// If it isn't, reset the current streak to 1
+			currentStreak = 1;
 		}
-		lastDay.add(1, "days");
+
+		// Update the longest streak if necessary
+		longestStreak = Math.max(longestStreak, currentStreak);
 	}
-	return count;
+	return longestStreak;
 };
 
+function isConsecutive(date1: string, date2: string) {
+	const d1 = new Date(date1);
+	const d2 = new Date(date2);
 
+	const timeDiff = d1.getTime() - d2.getTime();
+	const diffDays = timeDiff / (1000 * 3600 * 24);
+	return diffDays === 1;
+}
 const currentStreak = (dates: string[]) => {
 	// sort dates
 	const sortedDates = dates.sort((a, b) => {
@@ -231,3 +240,10 @@ const currentStreak = (dates: string[]) => {
 
 	return count;
 };
+
+
+interface Options {
+	startDate: string;
+	endDate: string;
+}
+
